@@ -3,16 +3,17 @@ import { prisma } from '@/lib/server/prisma';
 import { comparePassword, generateToken } from '@/lib/server/auth';
 import { StatusCode } from '@/lib/server/status.code';
 import { loginSchema } from '@/lib/validations/auth.validation';
+import logger from '@/lib/server/logger';
 
 export async function POST(request: NextRequest) {
+  logger.info('Login attempt');
   try {
     const body = await request.json();
-    
-    // Validate input with Zod
     const validationResult = loginSchema.safeParse(body);
     
     if (!validationResult.success) {
       const errorMessages = validationResult.error.format();
+      logger.warn({ validation: errorMessages }, 'Login validation failed');
       return NextResponse.json(
         { error: errorMessages },
         { status: StatusCode.BAD_REQUEST }
@@ -21,34 +22,30 @@ export async function POST(request: NextRequest) {
     
     const { email, password } = validationResult.data;
 
-    // Find user by email
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+    const user = await prisma.user.findUnique({where:{ email }});
 
     if (!user) {
+      logger.warn({ email }, 'User not found during login');
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: StatusCode.UNAUTHORIZED }
       );
     }
 
-    // Verify password
     const isPasswordValid = await comparePassword(password, user.password);
 
     if (!isPasswordValid) {
+      logger.warn({ email }, 'Invalid password during login');
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: StatusCode.UNAUTHORIZED }
       );
     }
 
-    // Generate token
     const token = generateToken(user.id, user.email, user.role);
-
-    // Return user without password
     const { password: _, ...userWithoutPassword } = user;
 
+    logger.info({ userId: user.id }, 'Login successful');
     return NextResponse.json(
       {
         message: 'Login successful',
@@ -58,7 +55,7 @@ export async function POST(request: NextRequest) {
       { status: StatusCode.OK }
     );
   } catch (error) {
-    console.error('Login error:', error);
+    logger.error({ err: error }, 'Login error');
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: StatusCode.INTERNAL_SERVER_ERROR }
