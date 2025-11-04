@@ -1,0 +1,54 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(200)
+  email     String   @unique @db.VarChar(200)
+  mobile    String   @db.VarChar(12)
+  address   String   @db.VarChar(500)
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  products  Product[]
+}
+
+enum Role {
+  SUPER_ADMIN
+  USER
+}
+
+model Product {
+  id           Int       @id @default(autoincrement())
+  product_name String    @db.VarChar(200)
+  category     Category
+  type         String    @db.VarChar(150)
+  description  String    @db.VarChar(500)
+  ingredients  String    @db.VarChar(500)
+  imageUrl     Json      // JSON array of image URLs
+  sizePrice    Json      // JSON object for multiple sizes and prices
+  stock        Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relation (optional if needed)
+  userId       Int?
+  user         User?     @relation(fields: [userId], references: [id])
+}
+
+enum Category {
+  PERSONAL_CARE
+  HOME_CARE
+}
