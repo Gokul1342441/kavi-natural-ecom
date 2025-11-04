@@ -11,10 +11,10 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name      String   @db.VarChar(200)
   email     String   @unique @db.VarChar(200)
-  mobile    String   @db.VarChar(12)
+  mobile    String   @unique @db.VarChar(12)
   address   String   @db.VarChar(500)
   password  String
   role      Role     @default(USER)
@@ -31,7 +31,7 @@ enum Role {
 }
 
 model Product {
-  id           Int       @id @default(autoincrement())
+  id           String    @id @default(cuid())
   product_name String    @db.VarChar(200)
   category     Category
   type         String    @db.VarChar(150)
@@ -44,7 +44,7 @@ model Product {
   updatedAt    DateTime  @updatedAt
 
   // Relation (optional if needed)
-  userId       Int?
+  userId       String?
   user         User?     @relation(fields: [userId], references: [id])
 }
 
