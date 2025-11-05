@@ -6,7 +6,7 @@ CREATE TYPE "Category" AS ENUM ('PERSONAL_CARE', 'HOME_CARE');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" VARCHAR(200) NOT NULL,
     "email" VARCHAR(200) NOT NULL,
     "mobile" VARCHAR(12) NOT NULL,
@@ -15,13 +15,14 @@ CREATE TABLE "User" (
     "role" "Role" NOT NULL DEFAULT 'USER',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Product" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "product_name" VARCHAR(200) NOT NULL,
     "category" "Category" NOT NULL,
     "type" VARCHAR(150) NOT NULL,
@@ -32,7 +33,7 @@ CREATE TABLE "Product" (
     "stock" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "userId" INTEGER,
+    "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
 );
@@ -40,5 +41,5 @@ CREATE TABLE "Product" (
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
--- AddForeignKey
-ALTER TABLE "Product" ADD CONSTRAINT "Product_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "User_mobile_key" ON "User"("mobile");

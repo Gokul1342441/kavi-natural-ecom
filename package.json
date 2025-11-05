@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate": "pnpm prisma generate",
+    "migrate": "pnpm prisma migrate dev --name init",
+    "studio": "pnpm prisma studio",
+    "create-admin": "node scripts/create-admin.js"
   },
   "dependencies": {
     "@prisma/client": "6.18.0",
@@ -29,6 +33,8 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "ts-node": "^10.9.2",
+    "@types/bcryptjs": "^2.4.6"
   }
 }
